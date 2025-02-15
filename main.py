@@ -27,6 +27,7 @@ def main():
 
         for notified_socket in read_sockets:
             if notified_socket == server_socket:
+                # Accept new connection
                 client_socket, client_address = server_socket.accept()
                 sockets_list.append(client_socket)
                 clients[client_socket] = client_address
@@ -35,12 +36,16 @@ def main():
                 try:
                     message = notified_socket.recv(1024).decode('utf-8')
                     if message:
-                        print(f"Received: {message}")
+                        print(f"Received from {clients[notified_socket]}: {message}")
                     else:
+                        # Client disconnected
+                        print(f"Client {clients[notified_socket]} disconnected.")
                         sockets_list.remove(notified_socket)
                         del clients[notified_socket]
                         notified_socket.close()
                 except:
+                    # Handle unexpected disconnection
+                    print(f"Error with client {clients[notified_socket]}, disconnecting.")
                     sockets_list.remove(notified_socket)
                     del clients[notified_socket]
                     notified_socket.close()

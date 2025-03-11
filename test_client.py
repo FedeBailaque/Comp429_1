@@ -7,8 +7,8 @@ def test_single_client(server_ip, port):
     try:
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect((server_ip, port))
-        print(" Successfully connected to the server.")
-        time.sleep(1)  # Keep connection alive for a moment
+        print("Successfully connected to the server.")
+        time.sleep(1)
         client_socket.close()
         print("Connection closed properly.")
     except Exception as e:
@@ -25,12 +25,12 @@ def test_multiple_clients(server_ip, port, num_clients=3):
             clients.append(s)
             print(f"Client {i + 1} connected.")
 
-        time.sleep(2)  # Keep them connected for a moment
+        time.sleep(2)
         for s in clients:
             s.close()
-        print(" All clients disconnected successfully.")
+        print("All clients disconnected successfully.")
     except Exception as e:
-        print(f" Error in multiple client connection: {e}")
+        print(f"Error in multiple client connection: {e}")
 
 
 def test_send_message(server_ip, port, message="Hello Server!"):
@@ -40,6 +40,11 @@ def test_send_message(server_ip, port, message="Hello Server!"):
         client_socket.connect((server_ip, port))
         client_socket.send(message.encode('utf-8'))
         print(f"Sent message: {message}")
+
+        response = client_socket.recv(1024)
+        if response:
+            print(f"Server Response: {response.decode('utf-8')}")
+
         client_socket.close()
     except Exception as e:
         print(f"Failed to send message: {e}")
@@ -47,7 +52,7 @@ def test_send_message(server_ip, port, message="Hello Server!"):
 
 if __name__ == "__main__":
     SERVER_IP = "127.0.0.1"
-    PORT = 4322  # Change this to match your server's port
+    PORT = 4322
 
     print("\nRunning Tests...\n")
     test_single_client(SERVER_IP, PORT)

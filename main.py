@@ -2,6 +2,7 @@ import socket
 import select
 import sys
 import threading
+import ipaddress
 
 # Global vars
 running = True
@@ -38,18 +39,36 @@ Commands:
 """)
 
 def connect_to_peer(ip, port):
-    """Establish a TCP connection to a peer."""
+    """Establish a TCP connection to a peer, ensuring the IP is valid."""
+    global connections
     try:
+        # Validate the IP address format
+        try:
+            ipaddress.ip_address(ip)
+        except ValueError:
+            print(f"Error: Invalid IP address '{ip}'.")
+            return None
+
         port = int(port)
         if get_my_ip() == ip:
             print("Error: Cannot connect to yourself.")
             return None
+
+        # Check if the connection already exists
+        for conn in connections:
+            if conn.getpeername() == (ip, port):
+                print(f"Error: Already connected to {ip}:{port}.")
+                return None
+
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((ip, port))
+        connections.append(s)  # Store the new connection
+        print(f"Connected to {ip}:{port}")
         return s
     except Exception as e:
         print(f"Connection failed: {e}")
         return None
+
 
 def handle_user_input(server_socket):
     """Handles user commands."""

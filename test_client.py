@@ -45,6 +45,18 @@ def test_send_message(server_ip, port, message="Hello Server!"):
         client_socket.close()
     except Exception as e:
         print(f"Failed to send message: {e}")
+        
+def test_invalid_peer_info(server_ip, port):
+    """Test client that sends invalid data instead of expected IP:PORT."""
+    try:
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client_socket.connect((server_ip, port))
+        client_socket.sendall(b"Hello Server!")  # Invalid format (should be IP:PORT)
+        print("Sent invalid peer info to server.")
+        client_socket.close()
+    except Exception as e:
+        print(f"Error during invalid peer info test: {e}")
+        
 
 
 if __name__ == "__main__":

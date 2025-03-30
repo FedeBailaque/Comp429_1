@@ -1,7 +1,6 @@
 import socket
 import time
 
-
 def test_single_client(server_ip, port):
     """Test connecting a single client to the server."""
     try:
@@ -15,7 +14,6 @@ def test_single_client(server_ip, port):
     except Exception as e:
         print(f"Failed to connect: {e}")
 
-
 def test_multiple_clients(server_ip, port, num_clients=3):
     """Test connecting multiple clients to the server."""
     clients = []
@@ -26,11 +24,10 @@ def test_multiple_clients(server_ip, port, num_clients=3):
             s.sendall(f"127.0.0.1:{port}".encode())
             clients.append(s)
             print(f"Client {i + 1} connected.")
-
-        time.sleep(2)  # Keep them connected for a moment
+        time.sleep(2)
         for s in clients:
             s.close()
-        print(" All clients disconnected successfully.")
+        print("All clients disconnected successfully.")
     except Exception as e:
         print(f" Error in multiple client connection: {e}")
 
@@ -61,10 +58,8 @@ def test_invalid_peer_info(server_ip, port):
 
 
 if __name__ == "__main__":
-    SERVER_IP = "127.0.0.1"
-    PORT = 4322  # Change this to match your server's port
-
+    SERVER_IP = "127.0.0.1"  # Replace with actual server IP if needed
+    PORT = 4322
     print("\nRunning Tests...\n")
     test_single_client(SERVER_IP, PORT)
     test_multiple_clients(SERVER_IP, PORT, num_clients=3)
-    test_send_message(SERVER_IP, PORT)

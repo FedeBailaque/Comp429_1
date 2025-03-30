@@ -3,6 +3,7 @@ import select
 import sys
 import threading
 import ipaddress
+import ipaddress
 
 running = True
 active_connections = {}  # {id: (socket, (ip, port))}
@@ -11,6 +12,7 @@ lock = threading.Lock()
 
 # Get the local IP address of machine
 def get_my_ip():
+    """Retrieve the external IP address."""
     try:
         host_name = socket.gethostname()
         ip_list = socket.gethostbyname_ex(host_name)[2]
@@ -24,17 +26,22 @@ def get_my_ip():
 
 # get port server is listening on
 def get_my_port(server_socket):
+    """Retrieve the port the server is listening on."""
     return server_socket.getsockname()[1]
 
 
 # menu commands
 def display_help():
+    """Display the list of available commands."""
     print("""
 Commands:
   help - list of commands
   myip - display IP address
   myport - display port that is listening
   connect <IP> <PORT> - establish connection with IP and port
+  list - display all active connections
+  terminate <connection id> - close a specific connection
+  send <connection id> <message> - send a message to a connection
   list - display all active connections
   terminate <connection id> - close a specific connection
   send <connection id> <message> - send a message to a connection
@@ -84,6 +91,7 @@ def connect_to_peer(ip, port, server_socket):
                 print(f"Error: Already connected to {ip}:{port}.")
                 return None
 
+
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((ip, port))
 
@@ -94,12 +102,15 @@ def connect_to_peer(ip, port, server_socket):
         threading.Thread(target=handle_peer_messages, args=(s, (ip, port)), daemon=True).start()
         return s
     except Exception as e:
+    except Exception as e:
         print(f"Connection failed: {e}")
         return None
 
 # This function handles user input for commands and manages connections
 def handle_user_input(server_socket):
     global running
+    while running:
+        try:
     while running:
         try:
             command = input(">>> ").strip()
@@ -161,6 +172,7 @@ def handle_user_input(server_socket):
                         print("Usage: send <connection id> <message>")
                 else:
                     print("Usage: send <connection id> <message>")
+                    print("Usage: send <connection id> <message>")
             elif command == "exit":
                 print("Shutting down...")
                 running = False
@@ -177,6 +189,7 @@ def main():
 
     if len(sys.argv) != 2:
         print("Usage: python3 main.py <port>")
+        print("Usage: python3 main.py <port>")
         sys.exit(1)
 
     port = int(sys.argv[1])
@@ -189,10 +202,12 @@ def main():
     display_help()
 
     input_thread = threading.Thread(target=handle_user_input, args=(server_socket,), daemon=True)
+    input_thread = threading.Thread(target=handle_user_input, args=(server_socket,), daemon=True)
     input_thread.start()
 
     try:
         while running:
+            read_sockets, _, _ = select.select([server_socket], [], [], 1)
             read_sockets, _, _ = select.select([server_socket], [], [], 1)
             if not running:
                 break
@@ -223,6 +238,9 @@ def main():
         running = False
 
     print("Closing all sockets...")
+    for _, (sock, _) in active_connections.items():
+        sock.close()
+    server_socket.close()
     for _, (sock, _) in active_connections.items():
         sock.close()
     server_socket.close()

@@ -7,6 +7,7 @@ def test_single_client(server_ip, port):
     try:
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect((server_ip, port))
+        client_socket.sendall(b"127.0.0.1:4322")
         print(" Successfully connected to the server.")
         time.sleep(1)  # Keep connection alive for a moment
         client_socket.close()
@@ -22,6 +23,7 @@ def test_multiple_clients(server_ip, port, num_clients=3):
         for i in range(num_clients):
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((server_ip, port))
+            s.sendall(f"127.0.0.1:{port}".encode())
             clients.append(s)
             print(f"Client {i + 1} connected.")
 
@@ -43,6 +45,19 @@ def test_send_message(server_ip, port, message="Hello Server!"):
         client_socket.close()
     except Exception as e:
         print(f"Failed to send message: {e}")
+        
+        
+def test_invalid_peer_info(server_ip, port):
+    """Test client that sends bad peer info (not ip:port)"""
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((server_ip, port))
+        s.send(b"Hello Server!")  # Invalid format
+        print("Sent invalid peer info.")
+        s.close()
+    except Exception as e:
+        print(f"Failed to send invalid peer info: {e}")        
+        
 
 
 if __name__ == "__main__":

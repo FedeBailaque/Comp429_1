@@ -176,7 +176,7 @@ def main():
     global running
 
     if len(sys.argv) != 2:
-        print("Usage: python3 main.py <port>")
+        print("Usage: python3 chat.py <port>")
         sys.exit(1)
 
     port = int(sys.argv[1])
